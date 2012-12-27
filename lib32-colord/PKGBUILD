@@ -1,0 +1,38 @@
+# Maintainer: josephgbr <rafael.f.f1@gmail.com>
+
+_pkgbase=colord
+pkgname=lib32-${_pkgbase}
+pkgver=0.1.24
+pkgrel=3
+pkgdesc="System daemon for managing color devices (32 bit)"
+arch=('x86_64')
+url="http://www.freedesktop.org/software/colord"
+license=('GPL2')
+depends=('lib32-libgusb' 'lib32-sqlite' 'lib32-polkit' 'lib32-lcms2' 'lib32-glib2' 'lib32-systemd' "${_pkgbase}")
+makedepends=('intltool' 'gobject-introspection' 'vala') #'docbook2x'
+source=(${url}/releases/${_pkgbase}-${pkgver}.tar.xz)
+options=('!libtool')
+sha1sums=('52089b72d79cd4358a86b7e646c42d23157bbcf9')
+
+build() {
+  export CC='gcc -m32'
+  export PKG_CONFIG_PATH='/usr/lib32/pkgconfig'
+  
+  cd ${_pkgbase}-${pkgver}
+  
+  # put udev files in /usr/lib
+  sed -i "/slashlibdir=/s#/lib#/usr/lib#" configure
+  
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc --libexecdir=/usr/lib32/colord \
+    --localstatedir=/var --disable-static \
+    --with-systemdsystemunitdir=/usr/lib/systemd/system \
+    --libexecdir=/usr/lib32/colord --libdir=/usr/lib32 \
+    --disable-manpages --disable-nls --enable-vala
+  make
+}
+
+package() {
+  make -C ${_pkgbase}-${pkgver} DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}"/{etc,lib,var,usr/{bin,include,lib,share}}
+}

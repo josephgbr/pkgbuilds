@@ -1,0 +1,40 @@
+# Maintainer : josephgbr <rafael.f.f1@gmail.com>
+# Contributor: TryA <tryagainprod {at} gmail.com>
+# Contributor: Ionut Biru <ibiru@archlinux.org>
+
+_pkgbase=libvdpau
+pkgname=lib32-libvdpau
+pkgver=0.5
+pkgrel=1
+pkgdesc="Nvidia VDPAU library (32-bit)"
+arch=('x86_64')
+url=http://cgit.freedesktop.org/~aplattner/libvdpau
+license=('custom')
+depends=('lib32-gcc-libs' "${_pkgbase}") #libx11
+makedepends=('gcc-multilib' 'lib32-libx11' )
+options=('!libtool')
+source=(http://people.freedesktop.org/~aplattner/vdpau/${_pkgbase}-${pkgver}.tar.gz
+        disable-xext.patch)
+sha1sums=('1b18b8f75eea52740af84881313d860ad5c27d0b'
+          'fc94abb2d29645e3447050524ec93f822d3571ae')
+
+build() {
+  export CC="gcc -m32"
+  export CXX="g++ -m32"
+  export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+
+  cd "${_pkgbase}-${pkgver}"
+  patch -p1 -i "${srcdir}"/disable-xext.patch
+  ./configure --prefix=/usr --libdir=/usr/lib32 --sysconfdir=/etc
+  make
+}
+
+package() {
+  cd "${srcdir}/${_pkgbase}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  rm -rf "${pkgdir}"/{etc,usr/include}
+
+  mkdir -p "$pkgdir"/usr/share/licenses
+  ln -s $_pkgbase "$pkgdir"/usr/share/licenses/$pkgname
+}
