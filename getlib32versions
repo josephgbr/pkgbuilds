@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+#   getlib32versions - Compare lib32 pkgs version against Arch's originals
+#
+#   Copyright (C) 2011-2012 Rafael Ferreira <rafael.f.f1@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+##### SET VARIABLES IN HERE!
+#
+# Debug: set 1 to print more info about each package comparison
+dbg=0
+#
+# username: set your AUR username here
+username=josephgbr
+#
+#########
+
+
+# Enable debug?
+[ "$1" == "-d" ] && dbg=1
+
+# Is username set in file or in command line?
+[ "$1" == "-u" ] && username=$2
+if [ "$username" == "" ]; then
+  echo "Error: username is not set in the script, please set it in the script."
+  exit 1
+fi
+
+# package cower is required
+if [ ! -x /usr/bin/cower ]; then
+  echo "Error: 'cower' not found but required, please install it."
+  exit 1
+fi
+
+pkgslib32=($(cower --quiet --msearch $username | grep lib32-))
+if [ $? -eq 0 ]; then
+  echo -e "Found ${#pkgslib32[@]} lib32 pkgs for username \"$username\". Looking for the out-of-date ones."
+else
+  echo -e "Erro: Can't search packages for username \"$username\". Is this name correct?"
+  exit 1
+fi
+
+for pkgnamelib32 in ${pkgslib32[@]}; do
+
+  # set pkgver and pkgname for the lib32 and original packages
+  pkgverlib32=$(cower -s $pkgnamelib32 | grep "aur/" | awk '{printf $2}' | cut -d'-' -f1)
+  pkgname=${pkgnamelib32/lib32-/} # from official repos
+  pkgver=$(LC_ALL=C pacman -Si $pkgname 2> /dev/null | grep Version | awk '{printf $3}' | cut -d'-' -f1)
+
+  # if pkgname doesn't exist, last pkgver should be empty
+  if [ ! -z $pkgver ]; then
+    result=$(vercmp $pkgver $pkgverlib32)
+    [ $result -eq 1 ] && \
+      echo -e "\n  * $pkgnamelib32 is $pkgverlib32, while non-lib32 package is $pkgver"
+  fi
+
+  if [ $dbg -eq 1 ]; then
+    printf "$pkgnamelib32, $pkgverlib32, $pkgname, $pkgver, result=$result\n"
+  else
+    printf . # not debug, just print a dot so one knows that it is not frozen
+  fi
+
+done
+echo
+
