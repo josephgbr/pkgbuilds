@@ -3,4 +3,5 @@
 *.tar.xz
 *.tar.gz
 *.log
-
+*/README
+README
