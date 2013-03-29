@@ -1,0 +1,16 @@
+# Maintainer: josephgbr <rafael.f.f1@gmail.com>
+
+pkgname=teeworlds-maple
+pkgver=1
+pkgrel=1
+pkgdesc="Some stuff from Maple clan for TeeWorlds"
+arch=(any)
+url="http://themapleclan.6te.net/"
+license=('GPL')
+depends=('teeworlds')
+source=(Maple.png)
+md5sums=('395d39204ae3370981a1874af8ea6c31')
+
+package() {
+  install -Dm644 Maple.png "$pkgdir"/usr/share/teeworlds/data/skins/Maple.png
+}
