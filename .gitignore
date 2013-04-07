@@ -3,5 +3,6 @@
 *.tar.xz
 *.tar.gz
 *.log
+*.log.*
 */README
 README
