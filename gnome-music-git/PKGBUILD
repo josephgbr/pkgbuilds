@@ -1,13 +1,13 @@
 # Maintainer: josephgbr <rafael.f.f1@gmail.com>
 
 pkgname=gnome-music-git
-pkgver=164.28c344b
+pkgver=171.2656c65
 pkgrel=1
 pkgdesc="Play and organize your music collection"
 arch=('i686' 'x86_64')
 url="http://www.gnome.org"
 license=('GPL')
-depends=('grilo' 'gstreamer0.10' 'libgee' 'desktop-file-utils')
+depends=('grilo-plugins' 'gstreamer0.10' 'libgee' 'desktop-file-utils')
 makedepends=('gjs' 'intltool' 'gobject-introspection' 'gnome-common' 'git')
 provides=('gnome-music')
 conflicts=('gnome-music')
