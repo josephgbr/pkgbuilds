@@ -1,0 +1,48 @@
+# Maintainer: josephgbr <rafael.f.f1@gmail.com>
+# Contributor: Lari Tikkanen <lartza@wippies.com>
+
+pkgname=teeworlds-git
+pkgver=0.7.start.341.g33efa4e
+pkgrel=1
+pkgdesc="A multiplayer 2D shooter"
+arch=('i686' 'x86_64')
+url="http://teeworlds.com"
+license=('custom')
+depends=('alsa-lib' 'glu' 'mesa' 'gcc-libs' 'sdl' 'freetype2')
+makedepends=('python' 'git' 'bam')
+provides=('teeworlds')
+conflicts=('teeworlds')
+source=(teeworlds.desktop teeworlds.png
+        git://github.com/teeworlds/teeworlds.git)
+md5sums=('3944aaf7a8c19a83510b2b39c4cddf5f'
+         '44f39e398409232a0e0a431ed46d8cc8'
+         'SKIP')
+
+pkgver() {
+  cd teeworlds
+  git describe | sed 's/^v//;s/-/./g;s/_/./g;'
+}
+
+build() {
+  cd teeworlds
+  bam release
+}
+
+package() {
+  cd teeworlds
+  
+  # get translations and maps into data/
+  git submodule init
+  git submodule update
+  
+  install -dm755 "$pkgdir"/usr/share/teeworlds/data/
+  cp -r data/* "$pkgdir"/usr/share/teeworlds/data
+
+  install -Dm755 teeworlds "$pkgdir"/usr/bin/teeworlds
+  install -Dm755 teeworlds_srv "$pkgdir"/usr/bin/teeworlds_srv
+
+  install -Dm644 license.txt "$pkgdir"/usr/share/licenses/teeworlds/license
+  install -Dm644 ../teeworlds.desktop "$pkgdir"/usr/share/applications/teeworlds.desktop
+  install -Dm644 ../teeworlds.png "$pkgdir"/usr/share/pixmaps/teeworlds.png
+
+}
