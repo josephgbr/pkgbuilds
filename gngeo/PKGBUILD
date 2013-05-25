@@ -17,23 +17,25 @@ elif [ $CARCH == x86_64 ]; then
   makedepends=('nasm' 'gcc-multilib')
 fi
 
-backup=(usr/share/${pkgname}/sample_gngeorc)
+backup=(usr/share/$pkgname/sample_gngeorc)
 install=gngeo.install
-source=(${url}/files/${pkgname}-${pkgver}.tar.gz
+source=($url/files/$pkgname-$pkgver.tar.gz
         4dec1ccfb85d.patch)
 md5sums=('21055885694e9f6cdbaa20be069a4258'
          'cfa16491e9e5185afec9342be49d55d1')
 
-build() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  
-  patch -p2 -i "${srcdir}/4dec1ccfb85d.patch"
+prepare() {
+  cd $pkgname-$pkgver
+  patch -p2 -i ../4dec1ccfb85d.patch
   sed 's#games/lib#share#' -i sample_gngeorc
-  
+  [ $CARCH == x86_64 ] && \
+    sed 's#/usr/lib/libGL.so#/usr/lib32/libGL.so#' -i sample_gngeorc
+}
+build() {
+  cd $pkgname-$pkgver
   if [ $CARCH == i686 ]; then
     ./configure --prefix=/usr --mandir=/usr/share/man  
   elif [ $CARCH == x86_64 ]; then
-    sed 's#/usr/lib/libGL.so#/usr/lib32/libGL.so#' -i sample_gngeorc
     ./configure --prefix=/usr --mandir=/usr/share/man \
         CC='gcc -m32' SDL_CONFIG='/usr/bin/sdl-config-32'
   fi
@@ -42,8 +44,8 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  make DESTDIR="${pkgdir}" install
-  install -Dm644 sample_gngeorc "${pkgdir}/usr/share/${pkgname}/sample_gngeorc"
-  install -Dm644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+  install -Dm644 sample_gngeorc "$pkgdir"/usr/share/$pkgname/sample_gngeorc
+  install -Dm644 COPYING "$pkgdir"/usr/share/licenses/$pkgname/COPYING
 }
