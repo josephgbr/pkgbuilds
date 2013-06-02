@@ -2,7 +2,7 @@
 # Contributor: Lari Tikkanen <lartza@wippies.com>
 
 pkgname=teeworlds-git
-pkgver=0.7.start.341.g33efa4e
+pkgver=0.7.start.344.g22c14e9
 pkgrel=1
 pkgdesc="A multiplayer 2D shooter"
 arch=('i686' 'x86_64')
