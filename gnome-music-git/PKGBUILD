@@ -2,7 +2,7 @@
 
 _name=gnome-music
 pkgname=$_name-git
-pkgver=268.e42e66f
+pkgver=411.d55c12a
 pkgrel=1
 pkgdesc="Play and organize your music collection"
 arch=('i686' 'x86_64')
@@ -15,12 +15,20 @@ provides=("$_name")
 conflicts=("$_name")
 install=$_name-git.install
 options=(!libtool)
-source=("git://git.gnome.org/$_name")
-md5sums=('SKIP')
+source=(git://git.gnome.org/$_name
+        git://git.gnome.org/libgd)
+md5sums=('SKIP' 'SKIP')
 
 pkgver() {
   cd $_name
   echo $(git rev-list --count master).$(git rev-parse --short master)
+}
+
+prepare() {
+  cd $_name
+  git submodule init
+  git config submodule.libgd.url "$srcdir/libgd"
+  git submodule update
 }
 
 build() {
